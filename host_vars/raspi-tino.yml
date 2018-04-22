@@ -1,0 +1,49 @@
+---
+
+ansible_become: yes
+ansible_become_method: sudo
+ansible_become_user: root
+
+
+# SQM configuration
+
+obs_name: Observatorio la Vara
+obs_location: "Valdes/Spain - La Vara"
+obs_owner: "Faustino Garcia (MPC J38)"
+obs_timezone: 1
+obs_lat: 43.472666
+obs_long: -6.3907638
+obs_alt: 216.0
+
+weewx_dir: /var/www/html/weewx
+weewx_ftp_dir: httpdocs/weather/weewx
+weewx_station_type: FineOffsetUSB
+weewx_station_model: WH1080
+weewx_station_url: http://www.elobservatoriu.com/weather/weewx
+
+
+sqm_obs_name: LA-VARA-VALDES
+sqm_conf_dir: /etc/pysqm
+sqm_data_dir: /home/pi/sqm
+sqm_device_addr: 192.168.1.37
+sqm_device_type: SQM_LE
+sqm_device_shorttype: SQM
+
+web_ftp_host: www.elobservatoriu.com
+web_ftp_user: elobserva
+web_ftp_pass: !vault |
+    $ANSIBLE_VAULT;1.1;AES256
+    64376166376439656634666165393564653530306330663034653031343736323064336231323663
+    6537393535396236313231363432306361396634333265650a633663366136626335353233333864
+    39636363616330323235336239656464306437326466313163353639386135646438333436376630
+    3662616365343864620a656637356638333635363234653239313834643131616533663961343737
+    3163
+
+dropbox_user: faustino.garcia@gmail.com
+dropbox_pass: !vault |
+    $ANSIBLE_VAULT;1.1;AES256
+    66613562363665343436626566326662643639663364373037396430663965613834326163333663
+    6136323033653362353435636437663731663562623265380a313861333138663764396262333964
+    37613532653030633433313933663439326136323032363438313462646134343033393066303533
+    3364326438373765370a363065626661626234336133653436333638383564386266663434336365
+    3734

@@ -1,0 +1,38 @@
+---
+
+- hosts: merak
+
+  vars:
+    hostname: merak
+    pip_install_packages:
+      - name: awscli
+
+  roles:
+    - role: geerlingguy.pip
+
+
+  tasks:
+    - name: Set hostname
+      hostname: name={{hostname}}
+
+    - name: Install OpenVPN
+      package:
+        name: openvpn
+        state: present
+
+    - name: Create $HOME/.aws folder
+      file:
+        path: "{{ ansible_env.HOME }}/.aws"
+        state: directory
+
+    - name: Configure AWS cli
+      template:
+        src: aws_config
+        dest: "{{ ansible_env.HOME }}/.aws/config"
+        mode: 0600
+
+    - name: Configure AWS cli
+      template:
+        src: aws_credentials
+        dest: "{{ ansible_env.HOME }}/.aws/credentials"
+        mode: 0600

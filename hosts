@@ -1,0 +1,9 @@
+
+# Hosts at VST observatory
+[vst]
+# Raspberry Pi 3 model B+
+merak
+
+# Hosts at l'observatoriu
+[observatoriu]
+raspi-tino

@@ -1,0 +1,12 @@
+[Unit]
+Description=Sky Quality Meter
+
+[Service]
+Type = simple
+User = pi
+WorkingDirectory = {{ sqm_data_dir }}
+ExecStart = /usr/bin/python -m pysqm -c {{ sqm_conf_dir }}/config.py
+Restart = on-failure
+
+[Install]
+WantedBy=multi-user.target

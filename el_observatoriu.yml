@@ -1,0 +1,112 @@
+---
+
+- hosts: raspi-tino
+
+  roles:
+    - role: geerlingguy.pip
+
+  tasks:
+    - name: Add weewx apt signing keys
+      apt_key: url={{item}} state=present
+      loop:
+        - "http://weewx.com/keys/tkeffer.gpg.key"
+        - "http://weewx.com/keys/mwall.gpg.key"
+
+    - name: Add weewx apt repository
+      apt_repository:
+        repo: "deb [arch=all] http://weewx.com/apt/ squeeze main"
+        state: present
+
+    - name: Install some packages
+      package: name={{ item }} state=present
+      loop:
+        - git
+        - weewx
+
+        # pysqm dependencies
+        - python-matplotlib
+
+        # weewx dependencies
+        - python-ephem
+        - python-configobj
+        - python-cheetah
+        - python-imaging
+        - python-dev
+        - python-pip
+
+    #- name: Install rclone
+      #TODO
+
+    #- name: Configure rclone
+      #TODO
+
+    ####################################################################
+    #  weewx
+    ####################################################################
+
+    - name: Install weewx custom skin
+      git:
+        repo: https://github.com/juanmb/weewx-sofaskin.git
+        dest: /etc/weewx/skins/Sofaskin
+        version: el-observatoriu
+
+    - name: Create weewx configuration file
+      template:
+        src: weewx.conf.j2
+        dest: /etc/weewx/weewx.conf
+
+    - name: Install PySQM
+      pip:
+        name: https://github.com/juanmb/PySQM/archive/master.zip
+
+    #- name: Configure Weewx backup
+      #cron:
+        #user: pi
+        #name: "backup Weewx DB to Dropbox"
+        #minute: "5"
+        #job: "rclone sync -v /var/lib/weewx/weewx.sdb droopbox:weewx.sdb.bak"
+
+    ####################################################################
+    #  PySQM
+    ####################################################################
+
+    - name: Create PySQM data directory
+      file:
+        path: "{{ sqm_data_dir }}"
+        state: directory
+
+    - name: Create PySQM config directory
+      file:
+        path: "{{ sqm_conf_dir }}"
+        state: directory
+
+    - name: Create PySQM configuration file
+      template:
+        src: pysqm_config.py.j2
+        dest: "{{ sqm_conf_dir }}/config.py"
+
+    - name: Create PySQM service file
+      template:
+        src: pysqm.service.j2
+        dest: "/etc/systemd/system/pysqm.service"
+
+    - name: Enable PySQM service
+      systemd:
+        name: pysqm
+        daemon-reload: yes
+        state: started
+        enabled: yes
+
+    - name: Configure PySQM backup
+      cron:
+        user: pi
+        name: "backup PySQM data to Dropbox"
+        minute: "0"
+        job: "rclone sync -v {{ sqm_data_dir }} dropbox:sqm_vara"
+
+    #- name: Configure Weewx FTP upload
+      #cron:
+        #user: pi
+        #name: "backup Weewx data to FTP"
+        #minute: "5"
+        #job: "rclone sync -v {{ weewx_dir }} ftp:{{ weewx_ftp_dir }}"
