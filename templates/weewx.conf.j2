@@ -41,7 +41,7 @@ version = 3.6.2
     station_type = {{ weewx_station_type }}
 
     # If you have a website, you may specify an URL
-    station_url = {{ weewx_statin_url }}
+    station_url = {{ weewx_station_url }}
 
     # The start of the rain year (1=January; 10=October, etc.). This is
     # downloaded from the station if the hardware supports it.
@@ -153,7 +153,7 @@ version = 3.6.2
 
         # The StandardReport uses the 'Standard' skin, which contains the
         # images, templates and plots for the report.
-        skin = Sofaskin
+        skin = {{ weewx_skin }}
 
         [[[Units]]]
             [[[[Groups]]]]
@@ -172,10 +172,10 @@ version = 3.6.2
         skin = Ftp
 
         # If you wish to use FTP, uncomment and fill out the next four lines.
-        #user = replace with the ftp username
-        #password = replace with the ftp password
-        #server = replace with the ftp server name, e.g, www.threefools.org
-        #path = replace with the ftp destination directory (e.g., /weather)
+        user = {{ web_ftp_user }}
+        password = {{ web_ftp_pass }}
+        server = {{ web_ftp_host }}
+        path = {{ weewx_ftp_dir }}
 
         # Set to True for an FTP over TLS (FTPS) connection. Not all servers
         # support this.

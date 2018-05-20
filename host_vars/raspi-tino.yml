@@ -15,12 +15,15 @@ obs_lat: 43.472666
 obs_long: -6.3907638
 obs_alt: 216.0
 
+weewx_skin: Sofaskin
 weewx_dir: /var/www/html/weewx
 weewx_ftp_dir: httpdocs/weather/weewx
 weewx_station_type: FineOffsetUSB
 weewx_station_model: WH1080
 weewx_station_url: http://www.elobservatoriu.com/weather/weewx
 
+meteoclimatic_code: ESAST3300000033784A
+meteoclimatic_sig: cf7a75ba8f4ace743bca0e2399f0a66e
 
 sqm_obs_name: LA-VARA-VALDES
 sqm_conf_dir: /etc/pysqm

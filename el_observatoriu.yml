@@ -50,25 +50,32 @@
         dest: /etc/weewx/skins/Sofaskin
         version: el-observatoriu
 
+    - name: Create meteoclimatic template
+      template:
+        src: meteoclimatic.htm.tmpl.j2
+        dest: /etc/weewx/skins/{{ weewx_skin }}/meteoclimatic.htm.tmpl
+
     - name: Create weewx configuration file
       template:
         src: weewx.conf.j2
         dest: /etc/weewx/weewx.conf
+      notify: Restart weewx
 
-    - name: Install PySQM
-      pip:
-        name: https://github.com/juanmb/PySQM/archive/master.zip
-
-    #- name: Configure Weewx backup
-      #cron:
-        #user: pi
-        #name: "backup Weewx DB to Dropbox"
-        #minute: "5"
-        #job: "rclone sync -v /var/lib/weewx/weewx.sdb droopbox:weewx.sdb.bak"
+    - name: Configure Weewx backup to Dropbox
+      cron:
+        user: pi
+        name: "backup Weewx DB to Dropbox"
+        minute: "5"
+        hour: "0"
+        job: "rclone copy -v /var/lib/weewx/weewx.sdb dropbox:weewx"
 
     ####################################################################
     #  PySQM
     ####################################################################
+
+    - name: Install PySQM
+      pip:
+        name: https://github.com/juanmb/PySQM/archive/master.zip
 
     - name: Create PySQM data directory
       file:
@@ -80,11 +87,6 @@
         path: "{{ sqm_conf_dir }}"
         state: directory
 
-    - name: Create PySQM configuration file
-      template:
-        src: pysqm_config.py.j2
-        dest: "{{ sqm_conf_dir }}/config.py"
-
     - name: Create PySQM service file
       template:
         src: pysqm.service.j2
@@ -94,19 +96,30 @@
       systemd:
         name: pysqm
         daemon-reload: yes
-        state: started
         enabled: yes
 
-    - name: Configure PySQM backup
+    - name: Create PySQM configuration file
+      template:
+        src: pysqm_config.py.j2
+        dest: "{{ sqm_conf_dir }}/config.py"
+      notify: Restart pysqm
+
+    - name: Configure PySQM backup to Dropbox
       cron:
         user: pi
         name: "backup PySQM data to Dropbox"
         minute: "0"
+        hour: "12"
         job: "rclone sync -v {{ sqm_data_dir }} dropbox:sqm_vara"
 
-    #- name: Configure Weewx FTP upload
-      #cron:
-        #user: pi
-        #name: "backup Weewx data to FTP"
-        #minute: "5"
-        #job: "rclone sync -v {{ weewx_dir }} ftp:{{ weewx_ftp_dir }}"
+
+  handlers:
+    - name: Restart weewx
+      service:
+        name: weewx
+        state: restarted
+
+    - name: Restart pysqm
+      service:
+        name: pysqm
+        state: restarted
