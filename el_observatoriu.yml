@@ -50,6 +50,16 @@
         dest: /etc/weewx/skins/Sofaskin
         version: el-observatoriu
 
+    - name: Download weathercloud extension
+      get_url:
+        url: http://lancet.mit.edu/mwall/projects/weather/releases/weewx-wcloud-0.11.tgz
+        dest: /home/pi/
+      register: weathercloud
+
+    - name: Install weathercloud extension
+      command: wee_extension --install /home/pi/weewx-wcloud-0.11.tgz
+      when: weathercloud.changed
+
     - name: Create meteoclimatic template
       template:
         src: meteoclimatic.htm.tmpl.j2
@@ -67,7 +77,7 @@
         name: "backup Weewx DB to Dropbox"
         minute: "5"
         hour: "0"
-        job: "rclone copy -v /var/lib/weewx/weewx.sdb dropbox:weewx"
+        job: "rclone sync -v --ignore-existing /var/lib/weewx dropbox:weewx"
 
     ####################################################################
     #  PySQM
@@ -110,7 +120,7 @@
         name: "backup PySQM data to Dropbox"
         minute: "0"
         hour: "12"
-        job: "rclone sync -v {{ sqm_data_dir }} dropbox:sqm_vara"
+        job: "rclone sync -v --ignore-existing {{ sqm_data_dir }} dropbox:sqm_vara"
 
 
   handlers:
