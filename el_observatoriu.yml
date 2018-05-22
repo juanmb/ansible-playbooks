@@ -75,8 +75,8 @@
       cron:
         user: pi
         name: "backup Weewx DB to Dropbox"
-        minute: "5"
-        hour: "0"
+        minute: 5
+        hour: 0
         job: "rclone sync -v --ignore-existing /var/lib/weewx dropbox:weewx"
 
     ####################################################################
@@ -118,8 +118,8 @@
       cron:
         user: pi
         name: "backup PySQM data to Dropbox"
-        minute: "0"
-        hour: "12"
+        minute: "*/15"
+        hour: 12
         job: "rclone sync -v --ignore-existing {{ sqm_data_dir }} dropbox:sqm_vara"
 
 
