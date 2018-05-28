@@ -48,6 +48,7 @@
       git:
         repo: https://github.com/juanmb/weewx-sofaskin.git
         dest: /etc/weewx/skins/Sofaskin
+        force: yes
         version: el-observatoriu
 
     - name: Download weathercloud extension
