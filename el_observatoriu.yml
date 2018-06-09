@@ -119,8 +119,8 @@
       cron:
         user: pi
         name: "backup PySQM data to Dropbox"
-        minute: "*/15"
-        hour: 12
+        minute: "0"
+        hour: "22-12"
         job: "rclone sync -v {{ sqm_data_dir }} dropbox:sqm_vara"
 
 
