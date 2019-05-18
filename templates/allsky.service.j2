@@ -1,0 +1,10 @@
+[Unit]
+Description=All Sky Camera
+After=multi-user.target
+
+[Service]
+User=pi
+ExecStart={{allsky_dir}}/allsky.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,89 @@
+---
+
+- hosts: allsky
+
+  vars:
+    allsky_dir: /home/pi/allsky
+    allsky_version: v0.6
+    apt_packages:
+      - git
+      - openvpn
+      - libopencv-dev
+      - libusb-dev
+      - libav-tools
+      - gawk
+      - lftp
+      - jq
+      - imagemagick
+      - python-pip
+
+  tasks:
+    - name: install APT packages
+      apt:
+        name: "{{ apt_packages }}"
+      become: true
+
+    #- name: install pip packages
+      #pip:
+        #name: "{{ pip_packages }}"
+      #become: true
+
+    - name: Clone allsky git repository
+      git:
+        repo: https://github.com/thomasjacquin/allsky.git
+        dest: "{{ allsky_dir }}"
+        version: "{{ allsky_version }}"
+        #force: yes
+      register: allsky_git
+
+    - set_fact:
+        arch: "{{ ansible_architecture | replace('6l', '6') }}"
+
+    - name: Set the processor architecture
+      lineinfile:
+        path: "{{ allsky_dir }}/Makefile"
+        regexp: '^platform ='
+        line: "platform = {{ arch }}"
+
+    - name: Compile allsky executable
+      make:
+        chdir: "{{ allsky_dir }}"
+        target: all
+
+    - name: Create link to sunwait executable
+      file:
+        src: "{{ allsky_dir }}/sunwait"
+        dest: "/usr/local/bin/sunwait"
+        state: link
+      become: true
+
+    - name: Create allsky config file
+      template:
+        src: allsky_config.sh.j2
+        dest: "{{ allsky_dir }}/config.sh"
+      notify: Restart allsky service
+
+    - name: Create camera settings file
+      template:
+        src: allsky_settings.json.j2
+        dest: "{{ allsky_dir }}/settings.json"
+      notify: Restart allsky service
+
+    - name: Create allsky.service
+      template:
+        src: allsky.service.j2
+        dest: /lib/systemd/system/allsky.service
+      become: true
+      notify: Restart allsky service
+
+    - service:
+        name: allsky
+        enabled: yes
+      become: true
+
+  handlers:
+    - name: Restart allsky service
+      service:
+        name: allsky
+        state: restarted
+      become: true

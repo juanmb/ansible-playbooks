@@ -2,8 +2,19 @@
 
 - hosts: raspi-tino
 
-  roles:
-    - role: geerlingguy.pip
+  vars:
+    apt_packages:
+      - git
+      - weewx
+      # pysqm dependencies
+      - python-matplotlib
+      # weewx dependencies
+      - python-ephem
+      - python-configobj
+      - python-cheetah
+      - python-imaging
+      - python-dev
+      - python-pip
 
   tasks:
     - name: Add weewx apt signing keys
@@ -18,21 +29,8 @@
         state: present
 
     - name: Install some packages
-      package: name={{ item }} state=present
-      loop:
-        - git
-        - weewx
-
-        # pysqm dependencies
-        - python-matplotlib
-
-        # weewx dependencies
-        - python-ephem
-        - python-configobj
-        - python-cheetah
-        - python-imaging
-        - python-dev
-        - python-pip
+      apt:
+        name: "{{ apt_packages }}"
 
     #- name: Install rclone
       #TODO

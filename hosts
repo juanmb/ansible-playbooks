@@ -2,7 +2,8 @@
 # Hosts at VST observatory
 [vst]
 # Raspberry Pi 3 model B+
-merak
+vega
+allsky
 
 # Hosts at l'observatoriu
 [observatoriu]
