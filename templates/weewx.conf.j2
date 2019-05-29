@@ -170,6 +170,7 @@ version = 3.6.2
                 group_degree_day = degree_C_day
                 group_speed = km_per_hour
 
+{% if weewx_enable_ftp %}
     [[FTP]]
         # FTP'ing the results to a webserver is treated as just another report,
         # albeit one with an unusual report generator!
@@ -179,7 +180,7 @@ version = 3.6.2
         user = {{ web_ftp_user }}
         password = {{ web_ftp_pass }}
         server = {{ web_ftp_host }}
-        path = {{ weewx_ftp_dir }}
+        path = {{ web_ftp_dir }}
 
         # Set to True for an FTP over TLS (FTPS) connection. Not all servers
         # support this.
@@ -194,6 +195,17 @@ version = 3.6.2
 
         # Set to 1 to use passive mode, zero for active mode
         passive = 1
+{% endif %}
+
+{% if weewx_enable_sftp %}
+    [[SFTP]]
+        skin = SFTP
+        user = {{ web_sftp_user }}
+        password = {{ web_sftp_pass }}
+        server = {{ web_sftp_host }}
+        port = 22
+        path = {{ web_sftp_dir }}
+{% endif %}
 
     [[RSYNC]]
         # rsync'ing to a webserver is treated as just another report

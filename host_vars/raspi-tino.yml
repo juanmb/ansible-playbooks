@@ -17,7 +17,6 @@ obs_alt: 216.0
 
 weewx_skin: Sofaskin
 weewx_dir: /var/www/html/weewx
-weewx_ftp_dir: httpdocs/weather/weewx
 weewx_station_type: FineOffsetUSB
 weewx_station_model: WH1080
 weewx_station_url: http://www.elobservatoriu.com/weather/weewx
@@ -42,6 +41,8 @@ sqm_device_addr: 192.168.1.37
 sqm_device_type: SQM_LE
 sqm_device_shorttype: SQM
 
+weewx_enable_ftp: false
+web_ftp_dir: httpdocs/weather/weewx
 web_ftp_host: www.elobservatoriu.com
 web_ftp_user: elobserva
 web_ftp_pass: !vault |
@@ -51,6 +52,18 @@ web_ftp_pass: !vault |
     39636363616330323235336239656464306437326466313163353639386135646438333436376630
     3662616365343864620a656637356638333635363234653239313834643131616533663961343737
     3163
+
+weewx_enable_sftp: true
+web_sftp_dir: /weather/weewx
+web_sftp_host: access783705212.webspace-data.io
+web_sftp_user: u97334074-ftp
+web_sftp_pass: !vault |
+    $ANSIBLE_VAULT;1.1;AES256
+    30376232653530663930366464323030383161376336336666363435633566353932383133386430
+    3437656264633764346363663738366461356238306235650a666236316661393566396462656362
+    37393836346438376436373132646266666433306435643937656538396565333530653365646363
+    6432366165663463610a363738633363343666626634343537326137336135373862356635613331
+    3034
 
 dropbox_user: faustino.garcia@gmail.com
 dropbox_pass: !vault |

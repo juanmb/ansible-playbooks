@@ -59,6 +59,20 @@
       command: wee_extension --install /home/pi/weewx-wcloud-0.11.tgz
       when: weathercloud.changed
 
+    - name: Install pysftp
+      pip:
+        name: pysftp
+
+    - name: Download SFTP extension
+      get_url:
+        url: https://github.com/matthewwall/weewx-sftp/archive/master.zip
+        dest: /home/pi/weewx-sftp.zip
+      register: sftp
+
+    - name: Install SFTP extension
+      command: wee_extension --install /home/pi/weewx-sftp.zip
+      when: sftp.changed
+
     - name: Create meteoclimatic template
       template:
         src: meteoclimatic.htm.tmpl.j2
