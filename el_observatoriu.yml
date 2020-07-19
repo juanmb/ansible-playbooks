@@ -10,11 +10,32 @@
       - python-matplotlib
       # weewx dependencies
       - python-ephem
+      - python-nacl
       - python-configobj
       - python-cheetah
-      - python-imaging
+      - python-pil
       - python-dev
       - python-pip
+
+    rclone_config_location: "/home/pi/.config/rclone/rclone.conf"
+    install_manpages: false
+    rclone_configs:
+      - name: dropbox
+        properties:
+          type: dropbox
+          token: "{{ dropbox_token }}"
+      - name: ionos-sftp
+        properties:
+          type: sftp
+          host: "{{ web_sftp_host }}"
+          user: "{{ web_sftp_user }}"
+          pass: "{{ web_sftp_pass }}"
+          port: 22
+
+  # Este rol no funciona en raspberry. Instala la version de rclone para AMD64
+  # TODO: instalar y configurar rclone. La version 1.52.1 funciona bien.
+  #roles:
+  #- stefangweichinger.ansible_rclone
 
   tasks:
     - name: Add weewx apt signing keys
@@ -31,12 +52,6 @@
     - name: Install some packages
       apt:
         name: "{{ apt_packages }}"
-
-    #- name: Install rclone
-      #TODO
-
-    #- name: Configure rclone
-      #TODO
 
     ####################################################################
     #  weewx
@@ -59,19 +74,19 @@
       command: wee_extension --install /home/pi/weewx-wcloud-0.11.tgz
       when: weathercloud.changed
 
-    - name: Install pysftp
-      pip:
-        name: pysftp
+    #- name: Install pysftp
+      #pip:
+        #name: pysftp
 
-    - name: Download SFTP extension
-      get_url:
-        url: https://github.com/matthewwall/weewx-sftp/archive/master.zip
-        dest: /home/pi/weewx-sftp.zip
-      register: sftp
+    #- name: Download SFTP extension
+      #get_url:
+        #url: https://github.com/matthewwall/weewx-sftp/archive/master.zip
+        #dest: /home/pi/weewx-sftp.zip
+      #register: sftp
 
-    - name: Install SFTP extension
-      command: wee_extension --install /home/pi/weewx-sftp.zip
-      when: sftp.changed
+    #- name: Install SFTP extension
+      #command: wee_extension --install /home/pi/weewx-sftp.zip
+      #when: sftp.changed
 
     - name: Create meteoclimatic template
       template:
@@ -91,6 +106,14 @@
         minute: 5
         hour: 0
         job: "rclone sync -v /var/lib/weewx dropbox:weewx"
+
+    - name: Configure Weewx transfer to Ionos server
+      cron:
+        user: pi
+        name: "copy Weewx web to Ionos server"
+        minute: "*/15"
+        hour: "*"
+        job: "rclone sync -v {{ weewx_dir}} ionos-sftp:{{ web_sftp_dir }}"
 
     ####################################################################
     #  PySQM
@@ -127,13 +150,15 @@
         dest: "{{ sqm_conf_dir }}/config.py"
       notify: Restart pysqm
 
-    - name: Configure PySQM backup to Dropbox
+    # Hay que configurar el "remote" de rclone manualmente siguiendo las instrucciones en la web de rclone
+    # El root_folder_id debe ser el ID de la carpeta sqm_vara en Google Drive
+    - name: Configure PySQM backup to Drive
       cron:
         user: pi
         name: "backup PySQM data to Dropbox"
-        minute: "0"
+        minute: "*/30"
         hour: "22-12"
-        job: "rclone sync -v {{ sqm_data_dir }} dropbox:sqm_vara"
+        job: "rclone sync -v {{ sqm_data_dir }} sqm-drive:"
 
 
   handlers:
