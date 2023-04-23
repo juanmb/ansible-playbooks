@@ -17,20 +17,20 @@
       - python-dev
       - python-pip
 
-    rclone_config_location: "/home/pi/.config/rclone/rclone.conf"
-    install_manpages: false
-    rclone_configs:
-      - name: dropbox
-        properties:
-          type: dropbox
-          token: "{{ dropbox_token }}"
-      - name: ionos-sftp
-        properties:
-          type: sftp
-          host: "{{ web_sftp_host }}"
-          user: "{{ web_sftp_user }}"
-          pass: "{{ web_sftp_pass }}"
-          port: 22
+    # rclone_config_location: "/home/pi/.config/rclone/rclone.conf"
+    # install_manpages: false
+    # rclone_configs:
+      # - name: dropbox
+        # properties:
+          # type: dropbox
+          # token: "{{ dropbox_token }}"
+      # - name: ionos-sftp
+        # properties:
+          # type: sftp
+          # host: "{{ web_sftp_host }}"
+          # user: "{{ web_sftp_user }}"
+          # pass: "{{ web_sftp_pass }}"
+          # port: 22
 
   # Este rol no funciona en raspberry. Instala la version de rclone para AMD64
   # TODO: instalar y configurar rclone. La version 1.52.1 funciona bien.
@@ -38,6 +38,11 @@
   #- stefangweichinger.ansible_rclone
 
   tasks:
+    - name: Configure rclone
+      copy:
+        src: rclone.conf
+        dest: /home/pi/.config/rclone/rclone.conf
+
     - name: Add weewx apt signing keys
       apt_key: url={{item}} state=present
       loop:

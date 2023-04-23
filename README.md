@@ -21,7 +21,7 @@ Running the playbook
 
 Install required roles:
 
-    sudo ansible-galaxy install Stouts.openvpn geerlingguy.pip stefangweichinger.rclone
+    sudo ansible-galaxy install Stouts.openvpn geerlingguy.pip stefangweichinger.ansible_rclone
 
 Run the playbook site.yml using the provided inventory file. For example:
 
